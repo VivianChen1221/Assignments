@@ -96,6 +96,7 @@ def shortest_path(source, target):
     start = Node(state=source.start, parent=None, action=None)
     frontier = QueueFrontier() #BFS
     frontier.add(start)
+    explored = set()
 
     # Keep looping until solution found
     while True:
@@ -106,25 +107,20 @@ def shortest_path(source, target):
 
         # If node is the goal, then we have a solution
         if node.state == target:
-            person = []
-            movie = []
+            path = []
             while node.parent is not None:
-                movie.append(node.action)
-                person.append(node.state)
+                path.append((node.action, node.state)) #append tuple of pairs of movies(action) and people (states)
                 node = node.parent
-            movie.reverse()
-            person.reverse()
-            source.solution = (movie, person)
-            return source.solution
+            path.reverse()
+            return path
+        node = frontier.remove()
+        explored.append(node.state)
 
         # Expansion
         for movie, person in source.neighbors(node.state):
-            if not frontier.neighbors_for_person(person):
+            if not frontier.neighbors_for_person(person) and person not in explored:
                 child = Node(state=person, parent=node, action=movie)
                 frontier.add(child)
-
-    # TODO
-    raise NotImplementedError
 
 
 def person_id_for_name(name):
