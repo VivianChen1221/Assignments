@@ -55,7 +55,7 @@ def load_data(directory):
 def main():
     if len(sys.argv) > 2:
         sys.exit("Usage: python degrees.py [directory]")
-    directory = "Users\vivia\Desktop\CS50ai\degrees\degrees\"
+    directory = sys.argv[1] if len(sys.argv) == 2 else "large"
 
     # Load data from files into memory
     print("Loading data...")
@@ -93,7 +93,7 @@ def shortest_path(source, target):
     """
 
     # Initialize frontier to just the starting position
-    start = Node(state=source.start, parent=None, action=None)
+    start = Node(state=source, parent=None, action=None)
     frontier = QueueFrontier() #BFS
     frontier.add(start)
     explored = set()
@@ -106,6 +106,7 @@ def shortest_path(source, target):
             return None
 
         # If node is the goal, then we have a solution
+        node = frontier.remove()
         if node.state == target:
             path = []
             while node.parent is not None:
@@ -113,12 +114,11 @@ def shortest_path(source, target):
                 node = node.parent
             path.reverse()
             return path
-        node = frontier.remove()
-        explored.append(node.state)
+        explored.add(node.state)
 
         # Expansion
-        for movie, person in source.neighbors(node.state):
-            if not frontier.neighbors_for_person(person) and person not in explored:
+        for movie, person in neighbors_for_person(node.state):
+            if not frontier.contains_state(person) and person not in explored:
                 child = Node(state=person, parent=node, action=movie)
                 frontier.add(child)
 
